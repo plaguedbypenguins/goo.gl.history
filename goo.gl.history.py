@@ -6,12 +6,21 @@
 import json, httplib, time, cPickle
 import sys, os, math
 
-# read a db of old goo.gl stats
-# loop over all my goo.gl's and download all current stats
-# group and sum same goo.gl's by download type
-# compare current stats with last in db
-# print
-# if current dl's are the first after Sun 4am then add them to db
+# I made this 'cos I wanted to keep track of download stats for my various
+# Android/CyanogenMod derived roms - FirefoxOS/b2g, cm10, cm10.1, cm10.2, etc.
+# with various revisions of each. each new revision usually changes name
+# (because of dates in the file name and/or cryptographic hashes from download
+# sites) so generally each update needs a new download link.
+#
+# this little tool gathers together an arbitrary number of goo.gl links,
+# sums up the stats by "group" where a group is eg. cm10.2, and then presents
+# the stats in terms of (usually) downloads/week.
+#
+# only unprivileged google APIs are used so this can be used to track goo.gl
+# stats for anyone. it may be slightly more convenient to use the authenticated
+# google APIs to get a complete list of your own goo.gl links than to add them
+# in below, but then the urls need to be grouped into categories by hand anyway,
+# so hey. it's simpler just using the unprivileged APIs.
 
 
 groups = { 'b2g':['YYgisb', '7rr5ES'],
