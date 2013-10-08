@@ -54,12 +54,12 @@ class jsonSubset():
    def __init__(self,d):
       self.j = json.load(d)  # json calls .read()
 
-   def get(self,k):
+   def get(self,k,range='allTime'):
       if k == 'id':
          return self.j[k]
       if k == 'hits':
          k = 'shortUrlClicks'
-      return self.j['analytics']['allTime'][k]
+      return self.j['analytics'][range][k]
 
 def getLatestGooGl():
    summed = {}
