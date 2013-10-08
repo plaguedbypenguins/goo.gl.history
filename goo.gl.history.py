@@ -61,29 +61,37 @@ class jsonSubset():
          k = 'shortUrlClicks'
       return self.j['analytics'][range][k]
 
-def getLatestGooGl():
-   summed = {}
-   d = gooGet()
-   for g in groups.keys():
-      s = {}
-      s['hits'] = 0
-      s['countries'] = {}
-      s['referrers'] = {}
-      for u in groups[g]:
-         d.url(u)
-         j = jsonSubset(d)
-         print 'goo.gl', j.get('id')
-         s['hits'] += int(j.get('hits'))
-         for n in ( 'countries', 'referrers' ):
-            for a in j.get(n):
-               i = a['id']
-               cnt = a['count']
-               #print i, cnt
-               if a['id'] not in s[n].keys():
-                  s[n][i] = 0
-               s[n][i] += int(cnt)
-      summed[g] = s
-   return summed
+class getLatestGooGl():
+   def __init__(self):
+      self.j = {}
+      d = gooGet()
+      for g in groups.keys():
+         for u in groups[g]:
+            d.url(u)
+            self.j[u] = jsonSubset(d)
+            print self.j[u].get('id')
+
+   def get(self, range='allTime'):
+      summed = {}
+      for g in groups.keys():
+         s = {}
+         s['hits'] = 0
+         s['countries'] = {}
+         s['referrers'] = {}
+         for u in groups[g]:
+            j = self.j[u]
+            s['hits'] += int(j.get('hits', range))
+            for n in ( 'countries', 'referrers' ):
+               for a in j.get(n, range):
+                  i = a['id']
+                  cnt = a['count']
+                  #print i, cnt
+                  if a['id'] not in s[n].keys():
+                     s[n][i] = 0
+                  s[n][i] += int(cnt)
+         summed[g] = s
+      return summed
+
 
 def dayToDate(d):
    t = time.strptime(d, '%Y-%j')
@@ -389,13 +397,15 @@ def main():
    db = cPickle.load(open(dbName, 'rb'))
 
    # download new goo.gl data
+   goo = None
    if len(sys.argv) > 1 and sys.argv[1] == '-d':
       t = time.time()
-      l = getLatestGooGl()
-      #print l
+      goo = getLatestGooGl()
+      a = goo.get()
+      #print 'a', a
 
       # add new data to the in-memory db
-      db.append((t,l))
+      db.append((t,a))
 
       # save the new db
       cPickle.dump(db, open(dbName + '.tmp','wb'))
