@@ -103,6 +103,8 @@ class week():
    def __init__(self, db, g):
       self.w = {}
       self.t = []
+      self.g = g
+      self.firstT = None
       tCheck = []
       # only look at data for this group
       for i in db:
@@ -119,6 +121,10 @@ class week():
          d[g]['timestamp'] = t
          self.w[w] = d[g]
          self.w[w]['timestamp'] = t
+
+         # store the first timestamp
+         if self.firstT == None:
+            self.firstT = t
 
       # double check that the db really was sorted in time order
       assert(sorted(tCheck) == tCheck)
@@ -390,9 +396,45 @@ def printTwoColumns(n, pairs, c):
    if eo == 1:
       print
 
-def main():
-   db = []
+def checkForDbMonthAgo(w, a, m):
+   # look for missing db data a month ago that we might be able to fill in
+   d = {}
+   td = 0
+   for g in groups.keys():
+      t = w[g].wholeTimes()[-1]
+      t0 = w[g].wholeData()[t]['timestamp']
+      tm = t0 - 30*24*3600
+      ts = time.gmtime(tm)
+      tw = int(time.strftime( "%W", ts ))  # week of year, starting from 0
+      tw = time.strftime( "%Y", ts ) + "-%d" % ( 7*tw )   # bins of week of year, eg. 2010-21
+      tii = dayToDate(t)
+      twii = dayToDate(tw)
+      #print 'g', g, w[g].g, 't', t, tii, t0, 'tw', tw, twii, tm, 'firstT', w[g].firstT,
+      if tm > w[g].firstT and tw not in w[g].wholeTimes():
+         print 'fill in', twii
+      else:
+         #print
+         continue
 
+      td = tm
+      a2 = a[g]  # all time
+      a1 = m[g]  # in the last month
+      #print 'all time', a2
+      #print 'last month', a1
+      diff = {}
+      diff['hits'] = a2['hits'] - a1['hits']
+      for n in ( 'countries', 'referrers' ):
+         diff[n] = {}
+         for i,cnt in a2[n].iteritems():
+            diff[n][i] = a2[n][i]
+            if i in a1[n].keys():
+               diff[n][i] -= a1[n][i]
+            if diff[n][i] == 0:
+               del(diff[n][i])
+      d[g] = diff
+   return (td,d)
+
+def main():
    # load the old db
    db = cPickle.load(open(dbName, 'rb'))
 
@@ -424,6 +466,18 @@ def main():
       w[g] = week(db, g)
 
    printout(w, c)
+
+   # look back a month and see if we can fill in missing db records
+   if goo != None:
+      m = goo.get(range='month')
+      #print 'm', m
+      t,d = checkForDbMonthAgo(w, a, m)
+      #print '(t,d)', t,d
+      if d != {}:
+         print 'writing'
+         db.append((t,d))
+         cPickle.dump(db, open(dbName + '.tmp','wb'))
+         os.rename(dbName + '.tmp', dbName)
 
 
 if __name__ == "__main__":
