@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# (c) Robin Humble 2013
+# licensed under the GPLv3 or later
+
 import json, httplib, time, cPickle
 import sys, os, math
 
