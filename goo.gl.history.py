@@ -411,7 +411,7 @@ def checkForDbMonthAgo(w, a, m):
       twii = dayToDate(tw)
       #print 'g', g, w[g].g, 't', t, tii, t0, 'tw', tw, twii, tm, 'firstT', w[g].firstT,
       if tm > w[g].firstT and tw not in w[g].wholeTimes():
-         print 'fill in', twii
+         print 'fill in', g, twii
       else:
          #print
          continue
@@ -474,10 +474,13 @@ def main():
       t,d = checkForDbMonthAgo(w, a, m)
       #print '(t,d)', t,d
       if d != {}:
-         print 'writing'
-         db.append((t,d))
-         cPickle.dump(db, open(dbName + '.tmp','wb'))
-         os.rename(dbName + '.tmp', dbName)
+         if len(sys.argv) > 2 and sys.argv[2] == '-f':
+            print 'writing'
+            db.append((t,d))
+            cPickle.dump(db, open(dbName + '.tmp','wb'))
+            os.rename(dbName + '.tmp', dbName)
+         else:
+            print 'not writing month-ago fill-in. add -f to write'
 
 
 if __name__ == "__main__":
