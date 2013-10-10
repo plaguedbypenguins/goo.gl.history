@@ -235,9 +235,9 @@ def uniq(ll):
       prev = i
    return l
 
-def printout(w, c):
+def printout(w, c, modes):
    # print all-time stats instead of breaking things up by week
-   if len(sys.argv) > 1 and sys.argv[1] == '-a':
+   if 'all-time' in modes:
       for g in sorted(groups.keys()):
          t = w[g].wholeTimes()[-1]
          d = w[g].wholeData()[t]
@@ -248,7 +248,7 @@ def printout(w, c):
       return
 
    # compact one-line display of each week
-   if len(sys.argv) > 1 and sys.argv[1] == '-c':
+   if 'compact' in modes:
       # all available diff times
       t = []
       for g in groups.keys():
@@ -293,22 +293,24 @@ def printout(w, c):
       return
 
    # display each group separately
-   for g in sorted(groups.keys()):
-      print g
-      for i in w[g].times():
-         ii = dayToDate(i)
-         if i == w[g].times()[-1]:
-            print 'this week so far'
-         print ii,
-         d = w[g].data()[i]
-         print d['hits']
-      print 'extrapolate to end of week'
-      print '          ',
-      h = w[g].endOfWeekHits()
-      if h != None:
-         print h
-      prettyPrint(d, c)
-      print
+   if 'separate' in modes:
+      for g in sorted(groups.keys()):
+         print g
+         for i in w[g].times():
+            ii = dayToDate(i)
+            if i == w[g].times()[-1]:
+               print 'this week so far'
+            print ii,
+            d = w[g].data()[i]
+            print d['hits']
+         print 'extrapolate to end of week'
+         print '          ',
+         h = w[g].endOfWeekHits()
+         if h != None:
+            print h
+         prettyPrint(d, c)
+         print
+      return
 
 class countryLookup():
    def __init__(self):
@@ -434,13 +436,39 @@ def checkForDbMonthAgo(w, a, m):
       d[g] = diff
    return (td,d)
 
+def parseArgs():
+   modes = []
+   if len(sys.argv) <= 1:  # the no args default
+      modes.append('compact')
+      return modes
+
+   a = sys.argv[1:]
+   if '-d' in a:
+      modes.append('download')
+   if '-f' in a:
+      modes.append('fill-in-write')
+
+   # display modes
+   if '-s' in a:
+      modes.append('separate')
+   elif '-a' in a:
+      modes.append('all-time')
+   else:
+      modes.append('compact')
+
+   return modes
+
+
 def main():
+   # parse args
+   modes = parseArgs()
+
    # load the old db
    db = cPickle.load(open(dbName, 'rb'))
 
    # download new goo.gl data
    goo = None
-   if len(sys.argv) > 1 and sys.argv[1] == '-d':
+   if 'download' in modes:
       t = time.time()
       goo = getLatestGooGl()
       a = goo.get()
@@ -465,7 +493,7 @@ def main():
    for g in groups.keys():
       w[g] = week(db, g)
 
-   printout(w, c)
+   printout(w, c, modes)
 
    # look back a month and see if we can fill in missing db records
    if goo != None:
@@ -474,7 +502,7 @@ def main():
       t,d = checkForDbMonthAgo(w, a, m)
       #print '(t,d)', t,d
       if d != {}:
-         if len(sys.argv) > 2 and sys.argv[2] == '-f':
+         if 'fill-in-write' in modes:
             print 'writing'
             db.append((t,d))
             cPickle.dump(db, open(dbName + '.tmp','wb'))
