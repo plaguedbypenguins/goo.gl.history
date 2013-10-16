@@ -483,9 +483,24 @@ def loadConfig():
       path.append(os.path.dirname(c))
       c = os.path.split(c)[-1]
 
+   err = 0
    try:
       fp, pathname, description = imp.find_module(c, path)
    except ImportError:
+      err = 1
+
+   if err and path == None:
+      # try again with cwd in path
+      p = os.getcwd()
+      # for some reason have to explicitly add cwd to the path in order to get
+      # the conf file from the correct dir
+      sys.path.insert(0,p)
+      try:
+         fp, pathname, description = imp.find_module(c, path)
+         err = 0
+      except ImportError:
+         err = 1
+   if err:
       print 'error: loadConfig: config file', configFile, 'not found'
       sys.exit(1)
 
