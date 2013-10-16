@@ -70,6 +70,7 @@ class getLatestGooGl():
             d.url(u)
             self.j[u] = jsonSubset(d)
             print u, g, self.j[u].get('hits')
+      print
 
    def get(self, range='allTime'):
       summed = {}
