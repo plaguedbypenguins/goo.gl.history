@@ -26,7 +26,7 @@ import sys, os, math
 groups = { 'b2g':['YYgisb', '7rr5ES'],
           'cm10':['2s2fEm', 'ReLprf'],
         'cm10.1':['Tvu9vb', 'iEttco'],
-        'cm10.2':['zv1Mqz', 'yk9BrL', 'gSfw52', 'xJR6V2'] }
+        'cm10.2':['zv1Mqz', 'yk9BrL', 'gSfw52', 'xJR6V2', 'S4S7bg'] }
 
 dbName = '.goo.gl.pickle'
 countryName = '.country'
