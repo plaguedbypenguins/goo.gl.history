@@ -529,7 +529,17 @@ def main():
    loadConfig()
 
    # load the old db
-   db = cPickle.load(open(config.dbName, 'rb'))
+   try:
+      db = cPickle.load(open(config.dbName, 'rb'))
+   except IOError, err:
+      if not os.path.exists(config.dbName):
+         if 'download' not in modes:
+            print 'error: db load: "' + config.dbName + '" not found and not downloading. maybe run with -d to download something?'
+            sys.exit(1)
+         print 'warning: db load: "' + config.dbName + '" not found. initial run? setting db to be zero'
+         db = []
+      else:
+         raise IOError(err)
 
    # download new goo.gl data
    goo = None
