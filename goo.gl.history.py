@@ -324,6 +324,8 @@ class countryLookup():
    def lookup(self,abrev):
       if abrev in self.l.keys():
          return self.l[abrev]
+      if abrev != '--':
+         print 'country code "' + abrev + '" is unknown. consider adding it to', config.countryName
       return 'Unknown'
 
 def add(a1, a2):
