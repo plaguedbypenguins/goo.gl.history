@@ -4,7 +4,7 @@
 # licensed under the GPLv3 or later
 
 import json, httplib, time, cPickle
-import sys, os, math
+import sys, os, math, imp
 
 # I made this 'cos I wanted to keep track of download stats for my various
 # Android/CyanogenMod derived roms - FirefoxOS/b2g, cm10, cm10.1, cm10.2, etc.
@@ -19,17 +19,17 @@ import sys, os, math
 # only unprivileged google APIs are used so this can be used to track goo.gl
 # stats for anyone. it may be slightly more convenient to use the authenticated
 # google APIs to get a complete list of your own goo.gl links than to add them
-# in below, but then the urls need to be grouped into categories by hand anyway,
-# so hey. it's simpler just using the unprivileged APIs.
+# into the config file by hand, but then the urls still need to be grouped into
+# categories by hand anyway, so hey. also it's much simpler just using the
+# unprivileged APIs.
 
 
-groups = { 'b2g':['YYgisb', '7rr5ES'],
-          'cm10':['2s2fEm', 'ReLprf'],
-        'cm10.1':['Tvu9vb', 'iEttco'],
-        'cm10.2':['zv1Mqz', 'yk9BrL', 'gSfw52', 'xJR6V2', 'S4S7bg'] }
+# the default config file name. this can be over-ridden by a command line
+# argument eg. '-c /path/to/some_config_file.py' or '-c some_config_file'
+configFile = 'goo.gl.history.conf.py'
 
-dbName = '.goo.gl.pickle'
-countryName = '.country'
+# the config class that is loaded from a file in loadConfig() below
+config = None
 
 class gooGet():
    def __init__(self):
@@ -65,20 +65,20 @@ class getLatestGooGl():
    def __init__(self):
       self.j = {}
       d = gooGet()
-      for g in sorted(groups.keys()):
-         for u in groups[g]:
+      for g in sorted(config.groups.keys()):
+         for u in config.groups[g]:
             d.url(u)
             self.j[u] = jsonSubset(d)
             print u, g, self.j[u].get('hits')
 
    def get(self, range='allTime'):
       summed = {}
-      for g in groups.keys():
+      for g in config.groups.keys():
          s = {}
          s['hits'] = 0
          s['countries'] = {}
          s['referrers'] = {}
-         for u in groups[g]:
+         for u in config.groups[g]:
             j = self.j[u]
             s['hits'] += int(j.get('hits', range))
             for n in ( 'countries', 'referrers' ):
@@ -238,7 +238,7 @@ def uniq(ll):
 def printout(w, c, modes):
    # print all-time stats instead of breaking things up by week
    if 'all-time' in modes:
-      for g in sorted(groups.keys()):
+      for g in sorted(config.groups.keys()):
          t = w[g].wholeTimes()[-1]
          d = w[g].wholeData()[t]
          print g
@@ -251,7 +251,7 @@ def printout(w, c, modes):
    if 'compact' in modes:
       # all available diff times
       t = []
-      for g in groups.keys():
+      for g in config.groups.keys():
          t.extend(w[g].times())
       t.sort()
       diffT = uniq(t)
@@ -261,14 +261,14 @@ def printout(w, c, modes):
          if i == diffT[-1]:
             print 'this week so far'
          print ii,
-         for g in sorted(groups.keys()):
+         for g in sorted(config.groups.keys()):
             if i in w[g].times():
                d = w[g].data()[i]
                print g, d['hits'],
          print
       print 'extrapolate to end of week'
       print '          ',
-      for g in sorted(groups.keys()):
+      for g in sorted(config.groups.keys()):
          if i in w[g].times():
             h = w[g].endOfWeekHits()
             if h != None:
@@ -276,14 +276,14 @@ def printout(w, c, modes):
       print
       print 'all time'
       print '          ',
-      for g in sorted(groups.keys()):
+      for g in sorted(config.groups.keys()):
          t = w[g].wholeTimes()[-1]
          d = w[g].wholeData()[t]
          print g, d['hits'],
       print
       # combine data for all groups this week together
       dd = None
-      for g in groups.keys():
+      for g in config.groups.keys():
          if i in w[g].times():
             d = w[g].data()[i]
             dd = add(dd, d)
@@ -294,7 +294,7 @@ def printout(w, c, modes):
 
    # display each group separately
    if 'separate' in modes:
-      for g in sorted(groups.keys()):
+      for g in sorted(config.groups.keys()):
          print g
          for i in w[g].times():
             ii = dayToDate(i)
@@ -315,7 +315,7 @@ def printout(w, c, modes):
 class countryLookup():
    def __init__(self):
       self.l = {}
-      for f in open(countryName,'r').readlines():
+      for f in open(config.countryName,'r').readlines():
          abrev = f.split()[0].strip()
          country = f[len(abrev)+1:].strip()
          self.l[abrev] = country
@@ -402,7 +402,7 @@ def checkForDbMonthAgo(w, a, m):
    # look for missing db data a month ago that we might be able to fill in
    d = {}
    td = 0
-   for g in groups.keys():
+   for g in config.groups.keys():
       t = w[g].wholeTimes()[-1]
       t0 = w[g].wholeData()[t]['timestamp']
       tm = t0 - 30*24*3600
@@ -443,6 +443,15 @@ def parseArgs():
       return modes
 
    a = sys.argv[1:]
+
+   global configFile
+   if '-c' in a:
+      i = a.index('-c')
+      if len(a) < i+2:
+         print '-c needs a filename argument'
+         sys.exit(1)
+      configFile = a[i+1]
+
    if '-d' in a:
       modes.append('download')
    if '-f' in a:
@@ -458,13 +467,52 @@ def parseArgs():
 
    return modes
 
+def loadConfig():
+   global config
+
+   c = configFile
+   # strip off the last .py, if any
+   if c[-3:] == '.py':
+      c = c[:-3]
+
+   path = None
+   if os.path.dirname(c) != '':  # an absolute path given
+      path = []
+      path.append(os.path.dirname(c))
+      c = os.path.split(c)[-1]
+
+   try:
+      fp, pathname, description = imp.find_module(c, path)
+   except ImportError:
+      print 'error: loadConfig: config file', configFile, 'not found'
+      sys.exit(1)
+
+   # check we are reading a .py and noy a .pyc or .pyo or ...
+   if pathname.split('.')[-1] != 'py':
+      print 'error: loadConfig: looking for .py config file, but only', pathname.split('.')[-1], 'found'
+      sys.exit(1)
+
+   config = imp.load_module('config', fp, pathname, description)
+
+   err = 0
+   keys = dir(config)
+   for f in ('groups', 'dbName', 'countryName'):
+      if f not in keys:
+         print 'error: loadConfig: "' + f + '" not found in', configFile
+         err = 1
+   if err:
+      sys.exit(1)
+
 
 def main():
    # parse args
    modes = parseArgs()
 
+   # load config
+   loadConfig()
+
    # load the old db
-   db = cPickle.load(open(dbName, 'rb'))
+   db = cPickle.load(open(config.dbName, 'rb'))
 
    # download new goo.gl data
    goo = None
@@ -478,8 +526,8 @@ def main():
       db.append((t,a))
 
       # save the new db
-      cPickle.dump(db, open(dbName + '.tmp','wb'))
-      os.rename(dbName + '.tmp', dbName)
+      cPickle.dump(db, open(config.dbName + '.tmp','wb'))
+      os.rename(config.dbName + '.tmp', config.dbName)
       #print db
 
    # sort by time
@@ -490,7 +538,7 @@ def main():
 
    # split up all data into weekly bins and do diffs etc.
    w = {}
-   for g in groups.keys():
+   for g in config.groups.keys():
       w[g] = week(db, g)
 
    printout(w, c, modes)
@@ -505,8 +553,8 @@ def main():
          if 'fill-in-write' in modes:
             print 'writing'
             db.append((t,d))
-            cPickle.dump(db, open(dbName + '.tmp','wb'))
-            os.rename(dbName + '.tmp', dbName)
+            cPickle.dump(db, open(config.dbName + '.tmp','wb'))
+            os.rename(config.dbName + '.tmp', config.dbName)
          else:
             print 'not writing month-ago fill-in. add -f to write'
 
