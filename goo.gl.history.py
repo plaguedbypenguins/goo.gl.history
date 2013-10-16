@@ -65,11 +65,11 @@ class getLatestGooGl():
    def __init__(self):
       self.j = {}
       d = gooGet()
-      for g in groups.keys():
+      for g in sorted(groups.keys()):
          for u in groups[g]:
             d.url(u)
             self.j[u] = jsonSubset(d)
-            print self.j[u].get('id')
+            print u, g, self.j[u].get('hits')
 
    def get(self, range='allTime'):
       summed = {}
