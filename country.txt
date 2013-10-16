@@ -1,0 +1,116 @@
+bg Bulgaria
+es Spain
+it Italy
+at Austria
+co Colombia
+de Germany
+localhost -
+ly Libya
+arpa ---
+jp Japan
+mx Mexico
+tr Turkey
+pt Portugal
+py Paraguay
+vn Vietnam
+br Brazil
+by Belarus
+gr Greece
+id Indonesia
+ua Ukraine
+my Malaysia
+com ----
+in India
+au Australia
+net ----
+ru Russia
+pl Poland
+tw Taiwan
+th Thailand
+ee Estonia
+sk Slovakia
+cz Czech Rep
+fi Finland
+hu Hungary
+mk Macedonia
+md Moldova
+nz New Zealand
+ar Argentina
+bo Bolivia
+dk Denmark
+ec Ecuador
+fj Fiji  
+fr France
+il Israel
+ma Morocco
+pk Pakistan
+su Soviet Union
+al Albania
+eg Egypt
+kz Kazakhstan
+ro Romania
+lv Latvia
+cu Cuba  
+nl Netherlands
+za South Africa
+rs Serbia
+se Sweden
+np Nepal
+ae UA Emirates
+ir Iran  
+sy Syria
+ph Philippines
+eu eu/Africa
+ke Kenya
+pr Puerto Rico
+ba Bosnia&Herz
+gb UK    
+hk Hong Kong
+lu Luxembourg
+me Montenegro
+mn Mongolia
+mz Mozambique
+ch Switzerland
+bi Burundi
+ga Gabon
+kg Kyrgyzstan
+pg PNG   
+sa Saudi Arabia
+ca Canada
+tn Tunisia
+cd DR Congo
+mm Burma
+sd Sudan
+uz Uzbekistan
+cn China
+lt Lithuania
+us USA   
+pa Panama
+sv El Salvador
+ao Angola
+dz Algeria
+ge Georgia
+tv Tuvalu
+ng Nigeria
+bn Brunei
+lk Sri Lanka
+om Oman  
+sg Singapore
+gh Ghana
+no Norway
+ve Venezuela
+us United States
+cl Chile
+ci Ivory Coast
+vg Virgin Is.
+vg Virgin Islands
+uk UK   
+uk United Kingdom
+vu Vanuatu
+qa Qatar
+kh Cambodia
+pe Peru  
+be Belgium
+uy Uruguay
+tc Turks Is.
+tc Turks and Caicos Islands
