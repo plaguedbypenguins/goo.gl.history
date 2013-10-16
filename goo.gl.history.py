@@ -438,6 +438,24 @@ def checkForDbMonthAgo(w, a, m):
       d[g] = diff
    return (td,d)
 
+
+def usage():
+   print sys.argv[0], '[-h|--help] [-d] [-f] [-s|-a] [-c configFile.py]'
+   print '  -h  this message.'
+   print '  -d  download new data from goo.gl.'
+   print '  -f  append "fill-in" data to the database:'
+   print '          data to cover missed time intervals can sometimes be'
+   print '          synthesized using current and month-old goo.gl data.'
+   print '          write such data to the db when it is found.'
+   print ''
+   print 'display modes:'
+   print '      with no arguments the default (most compact) display mode is used.'
+   print '  -s  separate display stats for each group instead of all groups at once.'
+   print '  -a  like -s except display the sum of all stats instead of per week.'
+   print ''
+   print 'default: no download. display compact view of db.'
+   sys.exit(0)
+
 def parseArgs():
    modes = []
    if len(sys.argv) <= 1:  # the no args default
@@ -445,6 +463,9 @@ def parseArgs():
       return modes
 
    a = sys.argv[1:]
+
+   if '-h' in a or '--help' in a:
+      usage()
 
    global configFile
    if '-c' in a:
