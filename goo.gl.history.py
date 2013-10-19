@@ -69,7 +69,10 @@ class getLatestGooGl():
          for u in config.groups[g]:
             d.url(u)
             self.j[u] = jsonSubset(d)
-            print u, g, self.j[u].get('hits')
+            print u, g, self.j[u].get('hits'),
+            if int(self.j[u].get('hits','week')) != 0:
+               print self.j[u].get('hits','week'),
+            print
       print
 
    def get(self, range='allTime'):
