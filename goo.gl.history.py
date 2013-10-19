@@ -59,7 +59,17 @@ class jsonSubset():
          return self.j[k]
       if k == 'hits':
          k = 'shortUrlClicks'
-      return self.j['analytics'][range][k]
+      try:
+         return self.j['analytics'][range][k]
+      except KeyError:
+         if k in ( 'countries', 'referrers' ):
+            return []
+         elif k == 'hits':
+            return '0'
+         else:
+            print 'error: jsonSubset: id ' + self.j['id']
+            raise
+      return None
 
 class getLatestGooGl():
    def __init__(self):
