@@ -114,3 +114,11 @@ be Belgium
 uy Uruguay
 tc Turks Is.
 tc Turks and Caicos Islands
+tj Tajikistan
+do Dominican Rep
+do Dominican Republic
+io IndOceanTer
+io Indian Ocean Territory
+gt Guatemala
+iq Iraq  
+tg Togo  
