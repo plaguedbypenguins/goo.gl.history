@@ -390,11 +390,18 @@ def printTwoColumns(n, pairs, c):
    maxl = 0
    eo = 0
    bigCnt, i = pairs[0]
-   cntSpace = int(math.log10(bigCnt))
+   if bigCnt <= 0:
+      cntSpace = 1
+   else:
+      cntSpace = int(math.log10(bigCnt))
    for p in pairs:
       cnt, i = p
       i = i.lower()
-      st = ' '*(cntSpace - int(math.log10(cnt))) + '%d %s' % (cnt, i)
+      if cnt <= 0:
+         cSpace = 1
+      else:
+         cSpace = int(math.log10(cnt))
+      st = ' '*(cntSpace - cSpace) + '%d %s' % (cnt, i)
       if n == 'countries':
          st += ' %s' % c.lookup(i)
       if eo == 0:
