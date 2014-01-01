@@ -128,7 +128,9 @@ class week():
             continue
          ts = time.gmtime(t)
          w = int(time.strftime( "%W", ts ))  # week of year, starting from 0
-         w = time.strftime( "%Y", ts ) + "-%d" % ( 7*w )   # bins of week of year, eg. 2010-21
+         # bins of week of year in day format, eg. 2010-1, 2010-8, ...
+         # note that day needs to start from 1 as %j is 1-366.
+         w = time.strftime( "%Y", ts ) + "-%d" % ( 7*w + 1)
          #print w
          tCheck.append(w)
          # overwrite each to get the last of the week
