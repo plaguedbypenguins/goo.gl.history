@@ -122,3 +122,5 @@ io Indian Ocean Territory
 gt Guatemala
 iq Iraq  
 tg Togo  
+cm Cameroon
+mw Malawi
