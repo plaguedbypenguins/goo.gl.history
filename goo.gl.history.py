@@ -130,7 +130,7 @@ class week():
          w = int(time.strftime( "%W", ts ))  # week of year, starting from 0
          # bins of week of year in day format, eg. 2010-1, 2010-8, ...
          # note that day needs to start from 1 as %j is 1-366.
-         w = time.strftime( "%Y", ts ) + "-%d" % ( 7*w + 1)
+         w = time.strftime( "%Y", ts ) + "-%.3d" % ( 7*w + 1)
          #print w
          tCheck.append(w)
          # overwrite each to get the last of the week
@@ -433,12 +433,14 @@ def checkForDbMonthAgo(w, a, m):
       tm = t0 - 30*24*3600
       ts = time.gmtime(tm)
       tw = int(time.strftime( "%W", ts ))  # week of year, starting from 0
-      tw = time.strftime( "%Y", ts ) + "-%d" % ( 7*tw )   # bins of week of year, eg. 2010-21
+      tw = time.strftime( "%Y", ts ) + "-%.3d" % ( 7*tw + 1 )   # bins of week of year, eg. 2010-21
       tii = dayToDate(t)
       twii = dayToDate(tw)
       #print 'g', g, w[g].g, 't', t, tii, t0, 'tw', tw, twii, tm, 'firstT', w[g].firstT,
+      #print tm > w[g].firstT, tw not in w[g].wholeTimes(),
       if tm > w[g].firstT and tw not in w[g].wholeTimes():
          print 'fill in', g, twii
+         #print 'tw', tw, 'w[g].wholeTimes()', w[g].wholeTimes()
       else:
          #print
          continue
