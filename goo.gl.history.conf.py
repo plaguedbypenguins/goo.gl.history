@@ -8,3 +8,7 @@ dbName = 'goo.gl.pickle'
 
 # 2 letter country codes for some countries
 countryName = 'country.txt'
+
+# load a google public API key from a file. see
+#  https://developers.google.com/url-shortener/v1/getting_started#APIKey
+keyFile = '/some/path/to/secret.key'

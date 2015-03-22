@@ -37,7 +37,7 @@ class gooGet():
       self.r = None
 
    def url(self,u):
-      self.conn.request('GET', '/urlshortener/v1/url?shortUrl=http://goo.gl/' + u + '&projection=FULL')
+      self.conn.request('GET', '/urlshortener/v1/url?shortUrl=http://goo.gl/' + u + '&projection=FULL&key=' + config.key)
       r = self.conn.getresponse()
       if r.status != 200:
          print 'Error:', r.reason
@@ -559,13 +559,19 @@ def loadConfig():
 
    err = 0
    keys = dir(config)
-   for f in ('groups', 'dbName', 'countryName'):
+   for f in ('groups', 'dbName', 'countryName', 'keyFile'):
       if f not in keys:
          print 'error: loadConfig: "' + f + '" not found in', configFile
+         if f == 'keyFile':
+            print '  google now requires a key to access analytics. see'
+            print '    https://developers.google.com/url-shortener/v1/getting_started#APIKey'
+            print '  put this key into a file and add the filename (not the key) to this config'
          err = 1
    if err:
       sys.exit(1)
 
+   # load the key from the keyfile specified in the config
+   config.key = open(config.keyFile, 'r').readlines()[0].strip()
 
 def main():
    # parse args
