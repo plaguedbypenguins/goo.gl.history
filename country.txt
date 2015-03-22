@@ -115,7 +115,7 @@ uy Uruguay
 tc Turks Is.
 tc Turks and Caicos Islands
 tj Tajikistan
-do Dominican Rep
+do DominicanRep
 do Dominican Republic
 io IndOceanTer
 io Indian Ocean Territory
@@ -124,3 +124,26 @@ iq Iraq
 tg Togo  
 cm Cameroon
 mw Malawi
+mg Madagascar
+ye Yemen
+cg Rep Congo
+cg Republic of the Congo
+cr Costa Rica
+is Iceland
+hr Croatia
+mt Malta
+bd Bangladesh
+ug Uganda
+am Armenia
+ni Nicaragua
+gu Guam  
+ps Palestine
+bf Burkina Faso
+ml Mali  
+si Slovenia
+ht Haiti
+sb Solomon Is.
+sb Solomon Islands
+af Afghanistan
+kw Kuwait
+sz Swaziland
